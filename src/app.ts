@@ -9,6 +9,8 @@ import authRoutes from "./routes/auth.routes";
 import reservationRequestRoutes from "./routes/reservationRequest.routes";
 import mediaAssetRoutes from "./routes/mediaAsset.routes";
 import testimonialRoutes from "./routes/testimonial.routes";
+import blogRoutes from "./routes/blog.routes";
+import publicBlogRoutes from "./routes/publicBlog.routes";
 
 const app = express();
 
@@ -47,6 +49,8 @@ app.use(`${API_BASE}/auth`, authRoutes);
 app.use(`${API_BASE}/reservation-requests`, reservationRequestRoutes);
 app.use(`${API_BASE}/media-assets`, mediaAssetRoutes);
 app.use(`${API_BASE}/testimonials`, testimonialRoutes);
+app.use(`${API_BASE}/blogs`, blogRoutes);
+app.use(`${API_BASE}/public/blogs`, publicBlogRoutes);
 
 app.use((_req, res) => {
   res.status(404).json({ message: "Route not found" });
