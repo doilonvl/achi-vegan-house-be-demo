@@ -30,7 +30,7 @@ app.use(
       return cb(new Error(`CORS blocked for origin: ${origin}`));
     },
     credentials: true,
-  })
+  }),
 );
 
 app.use(helmet());
@@ -61,11 +61,11 @@ app.use(
     err: any,
     _req: express.Request,
     res: express.Response,
-    _next: express.NextFunction
+    _next: express.NextFunction,
   ) => {
     console.error("Unhandled error:", err);
     res.status(500).json({ message: err?.message || "Internal Server Error" });
-  }
+  },
 );
 
 export default app;

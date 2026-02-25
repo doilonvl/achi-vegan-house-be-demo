@@ -33,4 +33,17 @@ export const transporter = nodemailer.createTransport({
   requireTLS: !secure,
   connectionTimeout: 10000,
   socketTimeout: 10000,
+  // Tắt connection pooling để tránh connection bị "stale" giữa các lần gửi
+  pool: false,
 });
+
+export async function verifyMailer() {
+  try {
+    await transporter.verify();
+    console.log(
+      `[MAILER] SMTP ready — host=${process.env.SMTP_HOST} port=${port} secure=${secure} from=${process.env.MAIL_FROM_ADDR}`
+    );
+  } catch (e: any) {
+    console.error("[MAILER] SMTP verify failed:", e?.message);
+  }
+}

@@ -224,6 +224,54 @@ ${sourceLabel ? `${t.labels.source}: ${sourceLabel}\n` : ""}${
   }
 `;
 
+  // Nếu có MAILJET_API_KEY thì dùng Mailjet REST API (đáng tin hơn SMTP)
+  const mjKey = process.env.MAILJET_API_KEY || process.env.SMTP_USER;
+  const mjSecret = process.env.MAILJET_API_SECRET || process.env.SMTP_PASS;
+  const isMailjet =
+    mjKey &&
+    mjSecret &&
+    (process.env.SMTP_HOST || "").includes("mailjet");
+
+  if (isMailjet) {
+    const body = {
+      Messages: [
+        {
+          From: { Email: fromAddr, Name: fromName },
+          To: [{ Email: toAdmin }],
+          ...(payload.email ? { ReplyTo: { Email: payload.email } } : {}),
+          Subject: subject,
+          HTMLPart: html,
+          TextPart: text,
+        },
+      ],
+    };
+    const res = await fetch("https://api.mailjet.com/v3.1/send", {
+      method: "POST",
+      headers: {
+        Authorization:
+          "Basic " +
+          Buffer.from(`${mjKey}:${mjSecret}`).toString("base64"),
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+    const data = (await res.json()) as any;
+    if (!res.ok) {
+      throw new Error(
+        `Mailjet API error ${res.status}: ${JSON.stringify(data)}`
+      );
+    }
+    const msg = data?.Messages?.[0];
+    console.log(
+      "[MAIL] Mailjet API OK — status:",
+      msg?.Status,
+      "| messageId:",
+      msg?.To?.[0]?.MessageID
+    );
+    return data;
+  }
+
+  // Fallback: SMTP (Gmail hoặc provider khác)
   const mailOptions = {
     from: `"${fromName}" <${fromAddr}>`,
     to: toAdmin,
@@ -233,5 +281,7 @@ ${sourceLabel ? `${t.labels.source}: ${sourceLabel}\n` : ""}${
     text,
   };
 
-  return transporter.sendMail(mailOptions);
+  const result = await transporter.sendMail(mailOptions);
+  console.log("[MAIL] SMTP OK — messageId:", result.messageId, "| response:", result.response);
+  return result;
 }
