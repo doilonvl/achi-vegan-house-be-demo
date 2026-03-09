@@ -47,14 +47,7 @@ function resolveLocale(req: Request) {
 export const mediaAssetController = {
   async create(req: Request, res: Response) {
     try {
-      const { kind, url, sortOrder } = req.body || {};
-      if (!kind || !url || sortOrder === undefined) {
-        return res
-          .status(400)
-          .json({ message: "kind, url, sortOrder are required" });
-      }
-
-      const doc = await mediaAssetRepo.create(req.body || {});
+      const doc = await mediaAssetRepo.create(req.body);
       return res.status(201).json(doc);
     } catch (err: any) {
       return res.status(400).json({ message: err?.message || "Bad Request" });

@@ -1,0 +1,9 @@
+process.env.JWT_ACCESS_SECRET = "test-access-secret-for-jest";
+process.env.JWT_REFRESH_SECRET = "test-refresh-secret-for-jest";
+// Tắt enforce email trong tests - không gửi mail thật, status = "new"
+process.env.ENFORCE_MAIL_DELIVERY = "false";
+process.env.API_BASE = "/api/v1";
+process.env.CORS_ORIGINS = "";
+process.env.NODE_ENV = "test";
+process.env.COOKIE_DOMAIN = "localhost";
+process.env.COOKIE_SECURE = "false";

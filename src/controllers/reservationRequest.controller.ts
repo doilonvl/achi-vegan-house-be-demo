@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import logger from "../config/logger";
 import { reservationRequestRepo } from "../repositories/reservationRequest.repo";
 import { sendReservationEmail } from "../services/sendReservationEmail";
 import { detectLocale } from "../i18n/localize";
@@ -25,20 +26,7 @@ export const reservationRequestController = {
         reservationTime,
         note,
         source,
-      } = req.body || {};
-
-      if (
-        !fullName ||
-        !phoneNumber ||
-        !guestCount ||
-        !reservationDate ||
-        !reservationTime
-      ) {
-        return res.status(400).json({
-          message:
-            "fullName, phoneNumber, guestCount, reservationDate, reservationTime are required",
-        });
-      }
+      } = req.body;
 
       const doc = await reservationRequestRepo.create({
         fullName,
@@ -96,7 +84,7 @@ export const reservationRequestController = {
             doc.emailedAt = new Date();
             await doc.save();
           },
-          (e) => console.error("[MAIL] Reservation send failed:", e?.message)
+          (e) => logger.error("[MAIL] Reservation send failed", { message: e?.message })
         );
       }
 
@@ -106,7 +94,7 @@ export const reservationRequestController = {
         status: doc.status,
       });
     } catch (err: any) {
-      console.error("reservation.create error", err);
+      logger.error("reservation.create error", { err });
       return res.status(400).json({ message: err?.message || "Bad Request" });
     }
   },
@@ -132,8 +120,7 @@ export const reservationRequestController = {
 
   async updateStatus(req: Request, res: Response) {
     const { id } = req.params;
-    const { status } = req.body || {};
-    if (!status) return res.status(400).json({ message: "status is required" });
+    const { status } = req.body;
 
     const doc = await reservationRequestRepo.update(id, { status });
     if (!doc) return res.status(404).json({ message: "Not found" });

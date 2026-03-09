@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import logger from "../config/logger";
 import { ParamsDictionary } from "express-serve-static-core";
 import { ParsedQs } from "qs";
 import { Types } from "mongoose";
@@ -262,7 +263,7 @@ export const blogController = {
       });
       return res.status(201).json(ensureCanonicalSlug(localized, locale));
     } catch (err: any) {
-      console.error("[BLOG CREATE]", err);
+      logger.error("[BLOG CREATE]", { err });
 
       if (err?.code === 11000) {
         return res.status(409).json({
@@ -371,7 +372,7 @@ export const blogController = {
       });
       return res.json(ensureCanonicalSlug(localized, locale));
     } catch (err: any) {
-      console.error("[BLOG UPDATE]", err);
+      logger.error("[BLOG UPDATE]", { err });
 
       if (err?.code === 11000) {
         return res.status(409).json({
@@ -402,7 +403,7 @@ export const blogController = {
       }
       res.json({ message: "Deleted successfully" });
     } catch (err: any) {
-      console.error("[BLOG DELETE]", err);
+      logger.error("[BLOG DELETE]", { err });
       res.status(400).json({ message: err?.message || "Delete failed" });
     }
   },
@@ -460,7 +461,7 @@ export const blogController = {
         items: localizedItems,
       });
     } catch (err: any) {
-      console.error("[BLOG LIST ADMIN]", err);
+      logger.error("[BLOG LIST ADMIN]", { err });
       res.status(500).json({ message: "Failed to list blogs (admin)" });
     }
   },
@@ -491,7 +492,7 @@ export const blogController = {
       });
       return res.json(ensureCanonicalSlug(localized, locale));
     } catch (err: any) {
-      console.error("[BLOG GET]", err);
+      logger.error("[BLOG GET]", { err });
       res.status(500).json({ message: "Failed to get blog" });
     }
   },
@@ -513,7 +514,7 @@ export const blogController = {
 
       res.json(updated);
     } catch (err: any) {
-      console.error("[BLOG PUBLISH]", err);
+      logger.error("[BLOG PUBLISH]", { err });
       res.status(400).json({ message: err?.message || "Publish failed" });
     }
   },
@@ -533,7 +534,7 @@ export const blogController = {
 
       res.json(updated);
     } catch (err: any) {
-      console.error("[BLOG ARCHIVE]", err);
+      logger.error("[BLOG ARCHIVE]", { err });
       res.status(400).json({ message: err?.message || "Archive failed" });
     }
   },
@@ -560,7 +561,7 @@ export const blogController = {
 
       res.json(updated);
     } catch (err: any) {
-      console.error("[BLOG SCHEDULE]", err);
+      logger.error("[BLOG SCHEDULE]", { err });
       res.status(400).json({ message: err?.message || "Schedule failed" });
     }
   },
@@ -599,7 +600,7 @@ export const blogController = {
       res.setHeader("Vary", "Accept-Language");
       res.json({ ...result, items: localized });
     } catch (err: any) {
-      console.error("[BLOG LIST PUBLIC]", err);
+      logger.error("[BLOG LIST PUBLIC]", { err });
       res.status(500).json({ message: "Failed to list blogs" });
     }
   },
@@ -626,7 +627,7 @@ export const blogController = {
       res.setHeader("Vary", "Accept-Language");
       return res.json(sanitizePublic(localized));
     } catch (err: any) {
-      console.error("[BLOG GET PUBLIC]", err);
+      logger.error("[BLOG GET PUBLIC]", { err });
       res.status(500).json({ message: "Failed to get blog" });
     }
   },
@@ -639,7 +640,7 @@ export const blogController = {
       }
       res.json({ viewCount: updated.stats?.viewCount || 0 });
     } catch (err: any) {
-      console.error("[BLOG VIEW COUNT]", err);
+      logger.error("[BLOG VIEW COUNT]", { err });
       res.status(400).json({ message: err?.message || "Update failed" });
     }
   },

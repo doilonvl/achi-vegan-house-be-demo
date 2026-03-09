@@ -46,14 +46,7 @@ function resolveLocale(req: Request) {
 export const testimonialController = {
   async create(req: Request, res: Response) {
     try {
-      const { quote_i18n, rating, authorName, sortOrder } = req.body || {};
-      if (!quote_i18n || !authorName || rating == null || sortOrder == null) {
-        return res.status(400).json({
-          message: "quote_i18n, rating, authorName, sortOrder are required",
-        });
-      }
-
-      const doc = await testimonialRepo.create(req.body || {});
+      const doc = await testimonialRepo.create(req.body);
       return res.status(201).json(doc);
     } catch (err: any) {
       return res.status(400).json({ message: err?.message || "Bad Request" });

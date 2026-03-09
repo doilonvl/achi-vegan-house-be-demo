@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import logger from "../config/logger";
 import { userRepo } from "../repositories/user.repo";
 import { verifyPassword } from "../utils/password";
 import {
@@ -14,15 +15,9 @@ export const authController = {
   login: async (req: Request, res: Response) => {
     try {
       const { email, password } = req.body as {
-        email?: string;
-        password?: string;
+        email: string;
+        password: string;
       };
-
-      if (!email || !password) {
-        return res
-          .status(400)
-          .json({ message: "Email and password are required" });
-      }
 
       const user = await userRepo.getByEmail(email);
       if (!user) {
@@ -60,7 +55,7 @@ export const authController = {
         role: user.role,
       });
     } catch (err) {
-      console.error("auth.login error", err);
+      logger.error("auth.login error", { err });
       return res.status(500).json({ message: "Internal server error" });
     }
   },
@@ -82,7 +77,7 @@ export const authController = {
         role: user.role,
       });
     } catch (err) {
-      console.error("auth.me error", err);
+      logger.error("auth.me error", { err });
       return res.status(500).json({ message: "Internal server error" });
     }
   },
@@ -92,7 +87,7 @@ export const authController = {
       clearAuthCookies(res);
       return res.json({ message: "Logged out" });
     } catch (err) {
-      console.error("auth.logout error", err);
+      logger.error("auth.logout error", { err });
       return res.status(500).json({ message: "Internal server error" });
     }
   },
@@ -130,7 +125,7 @@ export const authController = {
         accessToken,
       });
     } catch (err) {
-      console.error("auth.refresh error", err);
+      logger.error("auth.refresh error", { err });
       return res.status(500).json({ message: "Internal server error" });
     }
   },

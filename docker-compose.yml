@@ -1,0 +1,42 @@
+services:
+  api:
+    build:
+      context: .
+      target: runtime
+    image: ${API_IMAGE:-ghcr.io/doilonvl/achi-vegan-house-be:latest}
+    container_name: achi-api
+    restart: unless-stopped
+    ports:
+      - "${PORT:-5000}:5000"
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+    depends_on:
+      mongo:
+        condition: service_healthy
+    networks:
+      - achi-net
+
+  mongo:
+    image: mongo:7-jammy
+    container_name: achi-mongo
+    restart: unless-stopped
+    volumes:
+      - mongo-data:/data/db
+    environment:
+      MONGO_INITDB_DATABASE: achi_vegan
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - achi-net
+
+volumes:
+  mongo-data:
+
+networks:
+  achi-net:
+    driver: bridge
