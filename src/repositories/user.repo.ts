@@ -40,7 +40,8 @@ export const userRepo = {
     if (!includeInactive) filter.isActive = true;
     if (role) filter.role = role;
     if (q?.trim()) {
-      const keyword = new RegExp(q.trim(), "i");
+      const escaped = q.trim().replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const keyword = new RegExp(escaped, "i");
       filter.$or = [{ email: keyword }, { fullName: keyword }];
     }
 
